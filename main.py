@@ -7,6 +7,14 @@ import koreanize_matplotlib
 file_path = '202406_202406_연령별인구현황_월간.csv'
 data = pd.read_csv(file_path, encoding='cp949')
 
+# Function to clean and convert population data to integers
+def clean_population_data(pop_str):
+    return int(pop_str.replace(',', ''))
+
+# Apply the function to relevant columns
+for col in data.columns[1:]:
+    data[col] = data[col].apply(clean_population_data)
+
 # Streamlit App
 st.title('지역별 중학생 인구 비율')
 
@@ -17,10 +25,10 @@ region = st.selectbox('지역을 선택하세요:', data['행정구역'].unique(
 region_data = data[data['행정구역'] == region]
 
 # 중학생 인구 (13세 ~ 15세) 합계
-middle_school_population = region_data[['2024년06월_계_13세', '2024년06월_계_14세', '2024년06월_계_15세']].astype(int).sum(axis=1).values[0]
+middle_school_population = region_data[['2024년06월_계_13세', '2024년06월_계_14세', '2024년06월_계_15세']].sum(axis=1).values[0]
 
 # 전체 인구
-total_population = region_data['2024년06월_계_총인구수'].astype(int).values[0]
+total_population = region_data['2024년06월_계_총인구수'].values[0]
 
 # 비율 계산
 middle_school_ratio = middle_school_population / total_population * 100
@@ -40,3 +48,4 @@ ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
 # 그래프 출력
 st.pyplot(fig1)
+
